@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Indian-Literacy  D3 - Examples</title>
+	<meta charset="utf-8" />
+	<!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+	<!-- ======== Stylesheet for website styling ============== -->
+	<link rel="stylesheet" type="text/css" href="css/style.css"/>
+</head>
+<body>
+	<div class="container">
+		<nav class="navbar navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<div class="navbar-brand">
+						<ul class="nav navbar-nav navbar-right">
+							<li class="active"><a href="#">Indian Literacy</a></li>
+						</ul>
+					</div>
+				</div><!-- end navbar-header -->
+			</div>
+		</nav><!-- end navbar -->
+	</div>
+	<div class="row">
+		<h4>India Literacy</h4>
+	</div><hr>
+  	<script src="js/d3.min.js"></script>
+    <script>
+
+		(function() {
+
+	      d3.json("./includes/demo.json", function(err, data) {
+	          if (err) {
+	              console.log("Error: " + err);
+	              return;
+	          }
+            data=data[1];
+	          val(data);
+	      });
+
+	      function val(inputdata) {
+					var totalPopulation =0;
+					inputdata.forEach(function(data , index){
+							totalPopulation+= data.population;
+					});
+	          //console.log(inputdata);
+
+	          var width = 1300,
+	              height = 500,
+	              radius = Math.min(width, height) / 2;
+
+	          var color = d3.scale.ordinal()
+						.range(["#98abcf", "#3385ff", "#d0743e", "#cc7b00"]);
+
+	          var arc = d3.svg.arc()
+	              .outerRadius(radius - 10)
+	              .innerRadius(0);
+
+	          var labelArc = d3.svg.arc()
+	              .outerRadius(radius - 40)
+	              .innerRadius(radius - 40);
+
+	          var pie = d3.layout.pie()
+	              .sort(null)
+	              .value(function(d) {
+	                  return d.population;
+	              });
+
+	          var svg = d3.select("body").append("svg")
+	              .attr("width", width)
+	              .attr("height", height)
+	              .append("g")
+	              .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+	          var g = svg.selectAll(".arc")
+	              .data(pie(inputdata))
+	              .enter().append("g")
+	              .attr("class", "arc");
+
+	          g.append("path")
+	              .attr("d", arc)
+	              .style("fill", function(d) {
+	                  return color(d.data.category);
+	              });
+
+	          g.append("text")
+	              .attr("id", "categoryText")
+	              .attr("transform", function(d) {
+
+								    return "translate(" + labelArc.centroid(d) + ")";
+	              })
+								.text(function(d) {
+										var ratio = d3.format(".1%")((d.data.population/totalPopulation));
+										return d.data.category + " :" + ratio;
+								});
+
+
+	      }
+
+	  })();
+		</script>
+</body>
+</html>
